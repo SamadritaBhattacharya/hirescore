@@ -5,6 +5,12 @@ Run with: pytest tests/ -v
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
+
 import pytest
 from pydantic import ValidationError
 
@@ -21,8 +27,8 @@ from models.schemas import (
     AgentName,
 )
 from parsers.document_parser import DocumentParserFactory, PDFParser, DOCXParser, PlainTextParser
-from graph.routing_agent import RoutingAgent
-from graph.github_agent import GitHubAgent
+from agents.routing_agent import RoutingAgent
+from agents.github_agent import GitHubAgent
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +249,7 @@ class TestGitHubAgentUtils:
 class TestLinkedInAgentParsing:
 
     def test_parse_basic_profile(self):
-        from graph.linkedin_agent import LinkedInAgent
+        from agents.linkedin_agent import LinkedInAgent
         agent = LinkedInAgent()
         text = """John Doe
 Senior ML Engineer at TechCorp
@@ -271,7 +277,7 @@ IIT Bombay
         assert profile.total_experience_years >= 0
 
     def test_estimate_experience_years(self):
-        from graph.linkedin_agent import LinkedInAgent
+        from agents.linkedin_agent import LinkedInAgent
         agent = LinkedInAgent()
         text = "Software Engineer 2019 - 2024 at Company"
         years = agent._estimate_experience_years(text)

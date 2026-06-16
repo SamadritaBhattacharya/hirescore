@@ -17,7 +17,7 @@ from typing import Any
 
 from core.config import get_settings
 from core.logging import get_logger
-from graph.base_agent import BaseAgent
+from agents.base_agent import BaseAgent
 from models.schemas import AgentName, LinkedInProfile, ResearchJobState
 
 logger = get_logger(__name__)

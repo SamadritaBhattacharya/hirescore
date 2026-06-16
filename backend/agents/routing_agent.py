@@ -10,7 +10,7 @@ Responsibilities:
 
 from __future__ import annotations
 
-from graph.base_agent import BaseAgent
+from agents.base_agent import BaseAgent
 from models.schemas import AgentName, ResearchJobState
 from core.logging import get_logger
 
