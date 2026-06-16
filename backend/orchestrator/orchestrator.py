@@ -13,12 +13,12 @@ import asyncio
 from uuid import UUID
 
 from core.logging import get_logger
-from graph.github_agent import GitHubAgent
-from graph.linkedin_agent import LinkedInAgent
-from graph.routing_agent import RoutingAgent
-from graph.synthesizer_agent import SynthesizerAgent
-from graph.web_research_agent import WebResearchAgent
-from graph.fit_scorer_agent import FitScorerAgent
+from agents.github_agent import GitHubAgent
+from agents.linkedin_agent import LinkedInAgent
+from agents.routing_agent import RoutingAgent
+from agents.synthesizer_agent import SynthesizerAgent
+from agents.web_research_agent import WebResearchAgent
+from agents.fit_scorer_agent import FitScorerAgent
 from models.schemas import AgentName, JobStatus, ResearchJobState
 
 logger = get_logger(__name__)
