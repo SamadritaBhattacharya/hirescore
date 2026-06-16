@@ -69,6 +69,17 @@ class Settings(BaseSettings):
     )
 
     # =====================================================
+    # GITHUB
+    # =====================================================
+
+    github_token: str | None = Field(
+        default=None,
+        description="GitHub Personal Access Token. Optional — when set, "
+        "requests are authenticated (5000 req/hr) instead of "
+        "anonymous (60 req/hr)."
+    )
+
+    # =====================================================
     # APP
     # =====================================================
 
@@ -100,6 +111,11 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env.lower() == "production"
+
+    @property
+    def github_authenticated(self) -> bool:
+        """True when a GitHub token is configured."""
+        return bool(self.github_token)
 
 
 @lru_cache(maxsize=1)

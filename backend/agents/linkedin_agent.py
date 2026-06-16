@@ -30,7 +30,7 @@ class LinkedInAgent(BaseAgent):
     """
 
     def __init__(self) -> None:
-        super().__init__(name=AgentName.LINKEDIN, timeout_seconds=60)
+        super().__init__(name=AgentName.LINKEDIN, timeout_seconds=30)
         self._settings = get_settings()
 
     async def execute(self, state: ResearchJobState) -> ResearchJobState:
@@ -47,9 +47,9 @@ class LinkedInAgent(BaseAgent):
             profile = self._parse_resume(state.input.resume_text)
 
         # Strategy 3: attempt live scrape
-        elif state.input.linkedin_url and self._settings.linkedin_scraper_enabled:
-            logger.info("linkedin_parse_strategy", strategy="scrape")
-            profile = await self._scrape(str(state.input.linkedin_url))
+        # elif state.input.linkedin_url and self._settings.linkedin_scraper_enabled:
+        #     logger.info("linkedin_parse_strategy", strategy="scrape")
+        #     profile = await self._scrape(str(state.input.linkedin_url))
 
         # Strategy 4: minimal profile from URL only
         if profile is None:
@@ -110,60 +110,60 @@ class LinkedInAgent(BaseAgent):
         profile = self._parse_text(resume_text, source="resume_fallback")
         return profile
 
-    async def _scrape(self, url: str) -> LinkedInProfile | None:
-        """
-        Attempt LinkedIn scraping using linkedin-scraper.
-        This may fail due to LinkedIn's anti-bot measures.
-        Returns None on failure so caller can fall back.
-        """
-        try:
-            from linkedin_scraper import Person, actions
-            from selenium import webdriver
-            from selenium.webdriver.chrome.options import Options
-            from webdriver_manager.chrome import ChromeDriverManager
-            from selenium.webdriver.chrome.service import Service
+    # async def _scrape(self, url: str) -> LinkedInProfile | None:
+    #     """
+    #     Attempt LinkedIn scraping using linkedin-scraper.
+    #     This may fail due to LinkedIn's anti-bot measures.
+    #     Returns None on failure so caller can fall back.
+    #     """
+    #     try:
+    #         from linkedin_scraper import Person, actions
+    #         from selenium import webdriver
+    #         from selenium.webdriver.chrome.options import Options
+    #         from webdriver_manager.chrome import ChromeDriverManager
+    #         from selenium.webdriver.chrome.service import Service
 
-            options = Options()
-            options.add_argument("--headless")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--disable-gpu")
+    #         options = Options()
+    #         options.add_argument("--headless")
+    #         options.add_argument("--no-sandbox")
+    #         options.add_argument("--disable-dev-shm-usage")
+    #         options.add_argument("--disable-gpu")
 
-            driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()),
-                options=options,
-            )
+    #         driver = webdriver.Chrome(
+    #             service=Service(ChromeDriverManager().install()),
+    #             options=options,
+    #         )
 
-            try:
-                actions.login(
-                    driver,
-                    self._settings.linkedin_email,
-                    self._settings.linkedin_password,
-                )
-                person = Person(url, driver=driver, close_on_complete=False)
+    #         try:
+    #             actions.login(
+    #                 driver,
+    #                 self._settings.linkedin_email,
+    #                 self._settings.linkedin_password,
+    #             )
+    #             person = Person(url, driver=driver, close_on_complete=False)
 
-                profile = LinkedInProfile(
-                    name=person.name or "",
-                    headline=getattr(person, "headline", "") or "",
-                    location=getattr(person, "location", "") or "",
-                    current_role=person.job_title or "",
-                    current_company=person.company or "",
-                    skills=[s for s in (getattr(person, "skills", []) or [])],
-                    source="scrape",
-                )
-                profile.total_experience_years = self._estimate_experience_years(
-                    " ".join([e.get("date_range", "") for e in (getattr(person, "experiences", []) or [])])
-                )
-                return profile
-            finally:
-                driver.quit()
+    #             profile = LinkedInProfile(
+    #                 name=person.name or "",
+    #                 headline=getattr(person, "headline", "") or "",
+    #                 location=getattr(person, "location", "") or "",
+    #                 current_role=person.job_title or "",
+    #                 current_company=person.company or "",
+    #                 skills=[s for s in (getattr(person, "skills", []) or [])],
+    #                 source="scrape",
+    #             )
+    #             profile.total_experience_years = self._estimate_experience_years(
+    #                 " ".join([e.get("date_range", "") for e in (getattr(person, "experiences", []) or [])])
+    #             )
+    #             return profile
+    #         finally:
+    #             driver.quit()
 
-        except ImportError:
-            logger.warning("linkedin_scraper_not_installed")
-            return None
-        except Exception as exc:
-            logger.warning("linkedin_scrape_failed", error=str(exc))
-            return None
+    #     except ImportError:
+    #         logger.warning("linkedin_scraper_not_installed")
+    #         return None
+    #     except Exception as exc:
+    #         logger.warning("linkedin_scrape_failed", error=str(exc))
+    #         return None
 
     # --- Text extraction helpers ---
 

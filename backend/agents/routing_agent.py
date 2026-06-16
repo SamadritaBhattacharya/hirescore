@@ -30,7 +30,8 @@ class RoutingAgent(BaseAgent):
         agents: list[AgentName] = []
 
         # LinkedIn always runs (required input)
-        agents.append(AgentName.LINKEDIN)
+        if state.input.linkedin_url or state.input.linkedin_text:
+            agents.append(AgentName.LINKEDIN)
 
         # GitHub runs only if URL provided
         if state.input.github_url:
@@ -51,6 +52,7 @@ class RoutingAgent(BaseAgent):
             "routing_decided",
             job_id=str(state.job_id),
             agents=[a.value for a in agents],
+            has_linkedin=bool(state.input.linkedin_url or state.input.linkedin_text),
             has_github=bool(state.input.github_url),
             has_jd=bool(state.input.jd_text),
             has_resume=bool(state.input.resume_text),
