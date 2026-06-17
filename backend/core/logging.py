@@ -4,7 +4,6 @@ Production-grade: JSON in prod, pretty-print in dev.
 """
 
 import logging
-import sys
 from typing import Any
 
 import structlog
@@ -35,24 +34,19 @@ def configure_logging() -> None:
             structlog.dev.ConsoleRenderer(colors=True),
         ]
 
+    logging.basicConfig(
+        format="%(message)s",
+        level=getattr(logging, settings.log_level.upper(), logging.INFO),
+    )
+
     structlog.configure(
         processors=processors,
-        wrapper_class=structlog.make_filtering_bound_logger(
-            logging.getLevelName(settings.log_level)
-        ),
-        context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(sys.stdout),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
 
-    # Also configure stdlib logging
-    logging.basicConfig(
-        format="%(message)s",
-        stream=sys.stdout,
-        level=logging.getLevelName(settings.log_level),
-    )
 
-
-def get_logger(name: str) -> structlog.BoundLogger:
+def get_logger(name: str):
     """Get a named structured logger."""
     return structlog.get_logger(name)

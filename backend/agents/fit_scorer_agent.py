@@ -21,9 +21,7 @@ from typing import Any
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-# from groq import Groq
-from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage
+from groq import Groq
 from sentence_transformers import SentenceTransformer
 
 from core.config import get_settings
@@ -576,14 +574,12 @@ class FitScorerAgent(BaseAgent):
             f"Write 2 sentences explaining the culture fit score. Be specific and factual."
         )
         try:
-            # response = self._groq.chat.completions.create(
-            #     model=self._settings.groq_model,
-            #     messages=[{"role": "user", "content": prompt}],
-            #     max_tokens=150,
-            #     temperature=0.2,
-            # )
-            
-            response = self._groq.invoke([HumanMessage(content=prompt)])
+            response = self._groq.chat.completions.create(
+                model=self._settings.groq_model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=150,
+                temperature=0.2,
+            )
             return response.choices[0].message.content or ""
         except Exception:
             return f"Culture fit score: {score}/100"

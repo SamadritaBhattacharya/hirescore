@@ -52,6 +52,20 @@ class Settings(BaseSettings):
     )
 
     # =====================================================
+    # SEARCH (TAVILY)
+    # =====================================================
+
+    tavily_api_key: str = Field(
+        ...,
+        description="Tavily Search API Key — required by the web research agent"
+    )
+
+    tavily_max_results: int = Field(
+        default=5,
+        description="Max results to request per Tavily search call"
+    )
+
+    # =====================================================
     # EMBEDDINGS
     # =====================================================
 
@@ -80,6 +94,27 @@ class Settings(BaseSettings):
     )
 
     # =====================================================
+    # LINKEDIN
+    # =====================================================
+
+    linkedin_email: str | None = Field(
+        default=None,
+        description="LinkedIn login email. Optional — only needed if the "
+        "scraper-based agent path is enabled."
+    )
+
+    linkedin_password: str | None = Field(
+        default=None,
+        description="LinkedIn login password. Optional — see linkedin_email."
+    )
+
+    linkedin_scraper_enabled: bool = Field(
+        default=False,
+        description="When true, attempt to scrape LinkedIn directly instead "
+        "of relying on pasted profile text."
+    )
+
+    # =====================================================
     # APP
     # =====================================================
 
@@ -89,6 +124,11 @@ class Settings(BaseSettings):
 
     log_level: str = Field(
         default="INFO"
+    )
+
+    cors_origins: str = Field(
+        default="http://localhost:5173,http://localhost:3000",
+        description="Allowed CORS origins for the frontend, comma-separated."
     )
 
     # =====================================================
@@ -107,6 +147,10 @@ class Settings(BaseSettings):
     # =====================================================
     # HELPERS
     # =====================================================
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [item.strip() for item in self.cors_origins.split(",") if item.strip()]
 
     @property
     def is_production(self) -> bool:
