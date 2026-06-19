@@ -113,7 +113,7 @@ async function safeDetail(res: Response): Promise<string | null> {
 export function streamProgress(
   jobId: string,
   handlers: {
-    onEvent: (eventType: string, data: any) => void;
+    onEvent: (eventType: string, data: unknown) => void;
     onError?: (err: Error) => void;
   }
 ): () => void {
