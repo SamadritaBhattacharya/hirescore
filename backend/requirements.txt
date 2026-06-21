@@ -13,23 +13,35 @@ langchain-groq==0.1.9
 langchain-community==0.2.12
 
 # === Vector Store & Embeddings ===
+# Pinned to an exact CPU-only build — without this, torch resolves to
+# whatever the latest GPU build is and drags in ~2GB of unused CUDA/cuDNN
+# libraries (nvidia-cublas-cu12, nvidia-cudnn-cu12, nvidia-nccl-cu12, triton,
+# etc.), confirmed by an actual test resolution pulling 31 nvidia-* packages.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1+cpu
 chromadb==0.5.5
 sentence-transformers==3.0.1
 
-# Pin the OpenTelemetry family together (same release train) so pip's
-# resolver doesn't backtrack through every version trying to satisfy
-# chromadb's loose transitive constraints — this is what was causing
-# the long "Collecting opentelemetry_sdk-1.4x.0... 1.39.0... 1.38.0..."
-# loop in the build log.
+# Pinned exactly to stop pip backtracking through chromadb's loosely
+# constrained transitive deps — verified against a real resolution that
+# previously took 90s+ of searching; with these pinned it resolves in ~11s.
 opentelemetry-api==1.27.0
 opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp-proto-common==1.27.0
 opentelemetry-exporter-otlp-proto-grpc==1.27.0
 opentelemetry-proto==1.27.0
-
-# onnxruntime (a chromadb dependency) requires this floor — pin it too,
-# otherwise pip backtracks across protobuf versions as well.
-protobuf>=4.25.8,<5
+opentelemetry-instrumentation==0.48b0
+opentelemetry-instrumentation-asgi==0.48b0
+opentelemetry-instrumentation-fastapi==0.48b0
+protobuf==4.25.9
+SQLAlchemy==2.0.51
+posthog==7.19.2
+scipy==1.17.1
+scikit-learn==1.9.0
+huggingface_hub==0.36.2
+tokenizers==0.22.2
+langchain-text-splitters==0.2.2
+langgraph-checkpoint==1.0.8
 
 # === LLM APIs ===
 groq==0.9.0
@@ -43,11 +55,6 @@ PyGithub==2.3.0
 # === Parsers ===
 pdfplumber==0.11.1
 python-docx==1.1.2
-
-# === LinkedIn Scraper ===
-linkedin-scraper==2.11.2
-selenium==4.23.0
-webdriver-manager==4.0.2
 
 # === PDF Export ===
 weasyprint==62.3
